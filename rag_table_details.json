@@ -1,0 +1,28 @@
+{
+  "entries": [
+    {
+      "table_name": "CUSTOMER_MASTER",
+      "failure_type": "unique_constraint",
+      "status_column": "PROCESS_STATUS",
+      "recommended_status": "DUPLICATE_REVIEW",
+      "notes": "If duplicate customer_id found, flag existing and incoming records for review before merge.",
+      "query_template": "UPDATE CUSTOMER_MASTER SET PROCESS_STATUS='DUPLICATE_REVIEW' WHERE CUSTOMER_ID=:customer_id;"
+    },
+    {
+      "table_name": "ORDERS_STG",
+      "failure_type": "null_value",
+      "status_column": "LOAD_STATUS",
+      "recommended_status": "REJECTED_NULL",
+      "notes": "If required columns are null, reject row and set load status.",
+      "query_template": "UPDATE ORDERS_STG SET LOAD_STATUS='REJECTED_NULL' WHERE BATCH_ID=:batch_id AND ORDER_ID=:order_id;"
+    },
+    {
+      "table_name": "PAYMENT_FACT",
+      "failure_type": "unique_constraint",
+      "status_column": "ETL_STATUS",
+      "recommended_status": "REPROCESS",
+      "notes": "When unique transaction key collision happens due to replay, mark for reprocess.",
+      "query_template": "UPDATE PAYMENT_FACT SET ETL_STATUS='REPROCESS' WHERE TXN_ID=:txn_id;"
+    }
+  ]
+}
